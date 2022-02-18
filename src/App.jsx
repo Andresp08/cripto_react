@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import styled from '@emotion/styled'
 import Formulario from './components/Formulario'
 import Cotizacion from './components/Cotizacion'
+import Spinner from './components/Spinner'
 
 import imagenCripto from './img/imagen-criptos.png'
 
@@ -48,6 +49,7 @@ const App = ()  => {
   //Hooks
   const [monedas, setMonedas] = useState({});
   const [cotizacion, setCotizacion] = useState({});
+  const [cargando,setCargando] = useState(false);
 
   useEffect(() => {
     if(Object.keys(monedas).length > 0){
@@ -56,12 +58,17 @@ const App = ()  => {
       const {moneda, criptomoneda} = monedas;
 
       const cotizarCripto = async () => {
+        
+        setCargando(true);
+        setCotizacion({});
+
         const url = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${criptomoneda}&tsyms=${moneda}`;
 
         const respuesta = await fetch(url);
         const resultado = await respuesta.json();
 
         setCotizacion(resultado.DISPLAY[criptomoneda][moneda])
+        setCargando(false);
       }
       cotizarCripto();
     }
@@ -80,6 +87,7 @@ const App = ()  => {
         />
 
         {/*Mostrar de forma condicional*/}
+        {cargando && <Spinner />}
         {cotizacion.PRICE && <Cotizacion cotizacion={cotizacion} />}
       </div>
     </Contenedor>
